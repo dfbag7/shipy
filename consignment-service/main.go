@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	// Import the generated protobuf code
-	pb "./proto/consignment"
+	pb "github.com/dfbag7/shipy/consignment-service/proto/consignment"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
