@@ -78,6 +78,7 @@ func main() {
 	srv := micro.NewService(
 		// This name must match the package name given in your protobuf definition
 		micro.Name("consignment"),
+		micro.Version("latest"),
 	)
 
 	// Init will parse the command line flags.
