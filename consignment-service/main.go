@@ -5,9 +5,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 
 	// Import the generated protobuf code
 	pb "github.com/dfbag7/shipy/consignment-service/proto/consignment"
+	vesselProto "github.com/dfbag7/shipy/vessel-service/proto/vessel"
 	"github.com/micro/go-micro"
 )
 
@@ -41,20 +43,35 @@ func (repo *Repository) GetAll() []*pb.Consignment {
 // to give you a better idea.
 type service struct {
 	repo repository
+	vesselClient vesselProto.VesselServiceClient
 }
 
 // CreateConsignment - we created just one method on our service,
 // which is a create method, which takes a context and a request as an
 // argument, these are handled by the gRPC server.
 func (s *service) CreateConsignment(ctx context.Context, req *pb.Consignment, res *pb.Response) error {
+
+	// Here we call a client instance of our vessel service with our consignment weight,
+	// and the amount of containers as the capacity value
+	vesselResponse, err := s.vesselClient.FindAvailable(context.Background(), &vesselProto.Specification{
+		MaxWeight: req.Weight,
+		Capacity: int32(len(req.Containers)),
+	})
+	log.Printf("Found vessel: %s\n", vesselResponse.Vessel.Name)
+	if err != nil {
+		return err
+	}
+
+	// We set the VesselId as the vessel we got back from our
+	// vessel service
+	req.VesselId = vesselResponse.Vessel.Id
+
 	// Save our consignment
 	consignment, err := s.repo.Create(req)
 	if err != nil {
 		return err
 	}
 
-	// Return matching the `Response` message we created in our
-	// protobuf definition.
 	res.Created = true
 	res.Consignment = consignment
 
@@ -74,7 +91,7 @@ func main() {
 
 	repo := &Repository{}
 
-	// Create a new service. Optionally include some options here.
+	// Set-up micro service
 	srv := micro.NewService(
 		// This name must match the package name given in your protobuf definition
 		micro.Name("consignment"),
@@ -84,8 +101,10 @@ func main() {
 	// Init will parse the command line flags.
 	srv.Init()
 
+	vesselClient := vesselProto.NewVesselServiceClient("shipy.vessel.service", srv.Client())
+
 	// Register handler
-	pb.RegisterShippingServiceHandler(srv.Server(), &service{repo})
+	pb.RegisterShippingServiceHandler(srv.Server(), &service{repo, vesselClient})
 
 	// Run the server
 	if err := srv.Run(); err != nil {
