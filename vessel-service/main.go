@@ -9,7 +9,7 @@ import (
 	"github.com/micro/go-micro"
 )
 
-type Repository interface {
+type repository interface {
 	FindAvailable(*pb.Specification) (*pb.Vessel, error)
 }
 
@@ -49,12 +49,12 @@ func (s *service) FindAvailable(ctx context.Context, req *pb.Specification, res 
 
 func main() {
 	vessels := []*pb.Vessel {
-		&pb.Vessel { Id: "vessel001", Name: "Boaty McBoatface", MaxWeight: 200000, Capacity: 500 },
+		{ Id: "vessel001", Name: "Boaty McBoatface", MaxWeight: 200000, Capacity: 500 },
 	}
 	repo := &VesselRepository{ vessels }
 
 	srv := micro.NewService(
-		micro.Name("shipy.service.vessel"),
+		micro.Name("shipy.vessel.service"),
 	)
 
 	srv.Init()
