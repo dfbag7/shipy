@@ -16,7 +16,7 @@ RUN go mod download
 # Build the binary, with a few flags which will allow
 # us to run this binary in Aphine.
 #RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o shipy-consignment-service
-RUN go build -o shipy-consignment-service
+RUN go build -o shipy-consignment-service main.go repository.go handler.go datastore.go
 
 # Here we're using a second FROM statement, which is strange,
 # but this tells Docker to start a new build process with this
