@@ -1,6 +1,11 @@
 version: '3.1'
 
 services:
+  datastore:
+    image: mongo
+    ports:
+      - 27017:27017
+
   shipy-consignment-cli:
     build: ./consignment-cli
 
@@ -18,3 +23,4 @@ services:
       - 50052:50051
     environment:
       MICRO_ADDRESS: ":50051"
+      DB_HOST: "datastore:27017"

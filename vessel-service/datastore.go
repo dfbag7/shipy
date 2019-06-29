@@ -1,14 +1,17 @@
 package main
 
 import (
-	"context"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
+	"gopkg.in/mgo.v2"
 )
 
-func CreateClient(uri string) (*mongo.Client, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+// CreateSession creates the main session to our mongodb instance
+func CreateSession(host string) (*mgo.Session, error) {
+	session, err := mgo.Dial(host)
+	if err != nil {
+		return nil, err
+	}
 
-	return mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	session.SetMode(mgo.Monotonic, true)
+
+	return session, nil
 }

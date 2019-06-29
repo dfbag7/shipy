@@ -21,3 +21,14 @@ func (s *handler) FindAvailable(ctx context.Context, req *pb.Specification, res 
 	res.Vessel = vessel
 	return nil
 }
+
+func (s *handler) Create(ctx context.Context, req *pb.Vessel, res *pb.Response) error {
+	if err := s.repository.Create(req); err != nil {
+		return err
+	}
+
+	res.Vessel = req
+	res.Created = true
+
+	return nil
+}
