@@ -32,7 +32,7 @@ func main() {
 	service := micro.NewService(micro.Name("shipy.consignment.cli"))
 	service.Init()
 
-	client := pb.NewShippingServiceClient("consignment", service.Client())
+	consignmentClient := pb.NewShippingServiceClient("consignment", service.Client())
 
 	// Contact the server and print out its response.
 	file := defaultFilename
@@ -45,15 +45,14 @@ func main() {
 		log.Fatalf("Could not parse file: %v", err)
 	}
 
-
-	r, err := client.CreateConsignment(context.Background(), consignment)
+	r, err := consignmentClient.CreateConsignment(context.TODO(), consignment)
 	if err != nil {
-		log.Fatalf("Could not greet: %v", err)
+		log.Fatalf("Could not create: %v", err)
 	}
 
 	log.Printf("Created: %t", r.Created)
 
-	getAll, err := client.GetConsignments(context.Background(), &pb.GetRequest{})
+	getAll, err := consignmentClient.GetConsignments(context.Background(), &pb.GetRequest{})
 	if err != nil {
 		log.Fatalf("Could not list consignments: %v", err)
 	}
