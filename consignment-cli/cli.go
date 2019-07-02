@@ -3,6 +3,10 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
+	microclient "github.com/micro/go-micro/client"
+	"github.com/micro/go-micro/cmd"
+	"github.com/micro/go-micro/metadata"
 	"io/ioutil"
 	"log"
 	"os"
@@ -10,11 +14,9 @@ import (
 	"context"
 
 	pb "github.com/dfbag7/shipy/consignment-service/proto/consignment"
-	micro "github.com/micro/go-micro"
 )
 
 const (
-	address = "localhost:50051"
 	defaultFilename = "consignment.json"
 )
 
@@ -24,35 +26,56 @@ func parseFile(file string) (*pb.Consignment, error) {
 	if err != nil {
 		return nil, err
 	}
-	json.Unmarshal(data, &consignment)
+
+	err = json.Unmarshal(data, &consignment)
+	if err != nil {
+		return nil, err
+	}
+
 	return consignment, err
 }
 
 func main() {
-	service := micro.NewService(micro.Name("shipy.consignment.cli"))
-	service.Init()
 
-	consignmentClient := pb.NewShippingServiceClient("consignment", service.Client())
-
-	// Contact the server and print out its response.
-	file := defaultFilename
-	if len(os.Args) > 1 {
-		file = os.Args[1]
+	err := cmd.Init()
+	if err != nil {
+		log.Fatalf("Could not init: %v", err)
 	}
+
+	// Create new client
+	client := pb.NewShippingServiceClient("consignment", microclient.DefaultClient)
+
+	// Contact the server and print our its response
+	if len(os.Args) < 3 {
+		log.Fatal(errors.New("Not enough arguments, expecitng file and token."))
+	}
+
+	log.Println(os.Args)
+
+	file := os.Args[1]
+	token := os.Args[2]
 
 	consignment, err := parseFile(file)
 	if err != nil {
 		log.Fatalf("Could not parse file: %v", err)
 	}
 
-	r, err := consignmentClient.CreateConsignment(context.TODO(), consignment)
+	// Create a new context which contains our given token.
+	// This same context will be passed into both the calls we make
+	// to our consignment-service.
+	ctx := metadata.NewContext(context.Background(), map[string]string{
+		"token": token,
+	})
+
+	// First call using our tokenised context
+	r, err := client.CreateConsignment(ctx, consignment)
 	if err != nil {
-		log.Fatalf("Could not create: %v", err)
+		log.Fatalf("Could not create consignment: %v", err)
 	}
+	log.Printf("Created consignment: %t", r.Created)
 
-	log.Printf("Created: %t", r.Created)
-
-	getAll, err := consignmentClient.GetConsignments(context.Background(), &pb.GetRequest{})
+	// Second call
+	getAll, err := client.GetConsignments(ctx, &pb.GetRequest{})
 	if err != nil {
 		log.Fatalf("Could not list consignments: %v", err)
 	}
