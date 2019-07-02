@@ -9,7 +9,7 @@ import (
 
 type service struct {
 	repo Repository
-	//tokenService Authable
+	tokenService Authable
 }
 
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) error {
