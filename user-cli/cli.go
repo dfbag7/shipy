@@ -2,20 +2,21 @@ package main
 
 import (
 	pb "github.com/dfbag7/shipy/user-service/proto/user"
+	"github.com/micro/go-micro"
 	microclient "github.com/micro/go-micro/client"
-	"github.com/micro/go-micro/cmd"
 	"golang.org/x/net/context"
 	"log"
-	"os"
 )
 
 func main() {
-	err := cmd.Init()
-	if err != nil {
-		log.Fatalf("Could not init: %v", err)
-	}
+	srv := micro.NewService(
+		micro.Name("go.micro.srv.user-cli"),
+		micro.Version("latest"),
+	)
 
-	// Create new greeter client
+	// Init will parse the command line flags
+	srv.Init()
+
 	client := pb.NewUserServiceClient("go.micro.srv.user", microclient.DefaultClient)
 
 	name := "Ewan Valentine"
@@ -54,6 +55,4 @@ func main() {
 	}
 
 	log.Printf("Your access token is: %s", authResponse.Token)
-
-	os.Exit(0)
 }
