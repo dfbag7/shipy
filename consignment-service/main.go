@@ -1,4 +1,4 @@
-// shippy-service-consignment/main.go
+// shipy-service-consignment/main.go
 
 package main
 
