@@ -40,8 +40,9 @@ services:
     ports:
       - 50051:50051
     environment:
+      WAIT_HOSTS: datastore:27017
       MICRO_ADDRESS: ":50051"
-      DB_HOST: "datastore:27017"
+      DB_HOST: "mongodb://datastore:27017"
     depends_on:
       - datastore
       - shipy-user-service
@@ -51,7 +52,8 @@ services:
     ports:
       - 50052:50051
     environment:
+      WAIT_HOSTS: datastore:27017
       MICRO_ADDRESS: ":50051"
-      DB_HOST: "datastore:27017"
+      DB_HOST: "mongodb://datastore:27017"
     depends_on:
       - datastore

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	pb "github.com/dfbag7/shipy/user-service/proto/user"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/net/context"
@@ -71,5 +72,21 @@ func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.Response) 
 }
 
 func (srv *service) ValidateToken(ctx context.Context, req *pb.Token, res *pb.Token) error {
+	log.Printf("Validating token: %s", req.Token)
+
+	// Decode token
+	claims, err := srv.tokenService.Decode(req.Token)
+	if err != nil {
+		return err
+	}
+
+	log.Println(claims)
+
+	if claims.User.Id == "" {
+		return errors.New("invalid user")
+	}
+
+	res.Valid = true
+
 	return nil
 }

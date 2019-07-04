@@ -33,7 +33,7 @@ type TokenService struct {
 // Decode a token string into a token object
 func (srv *TokenService) Decode(token string) (*CustomClaims, error) {
 	// Parse the token
-	tokenType, err := jwt.ParseWithClaims(string(key), &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+	tokenType, err := jwt.ParseWithClaims(token, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return key, nil
 	})
 

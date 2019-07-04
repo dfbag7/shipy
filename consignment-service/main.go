@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	defaultHost = "datastore:27017"
+	defaultHost = "mongodb://datastore:27017"
 )
 
 func main() {

@@ -26,6 +26,10 @@ FROM alpine:latest
 # Security related package, good to have.
 RUN apk --no-cache add ca-certificates
 
+## Add the wait script to the image
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.5.0/wait /wait
+RUN chmod +x /wait
+
 # Same as before, create a directory to our app.
 RUN mkdir /app
 WORKDIR /app
@@ -39,4 +43,4 @@ COPY --from=builder /app/shipy-consignment-service/shipy-consignment-service .
 # Run the binary as per usual! This time with a binary build in a
 # separate container, with all of the correct dependencies and
 # run time libraries.
-CMD ["./shipy-consignment-service"]
+CMD /wait && /app/shipy-consignment-service
