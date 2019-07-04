@@ -22,12 +22,18 @@ services:
       DB_PORT: "5432"
       DB_USER: "postgres"
       DB_PASSWORD: "postgres"
+    depends_on:
+      - database
 
   shipy-user-cli:
     build: ./user-cli
+    depends_on:
+      - shipy-user-service
 
   shipy-consignment-cli:
     build: ./consignment-cli
+    depends_on:
+      - shipy-consignment-service
 
   shipy-consignment-service:
     build: ./consignment-service
@@ -36,6 +42,9 @@ services:
     environment:
       MICRO_ADDRESS: ":50051"
       DB_HOST: "datastore:27017"
+    depends_on:
+      - datastore
+      - shipy-user-service
 
   shipy-vessel-service:
     build: ./vessel-service
@@ -44,3 +53,5 @@ services:
     environment:
       MICRO_ADDRESS: ":50051"
       DB_HOST: "datastore:27017"
+    depends_on:
+      - datastore
