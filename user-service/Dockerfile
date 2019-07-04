@@ -8,7 +8,7 @@ COPY . .
 
 RUN go mod download
 
-RUN go build -o shipy-user-service main.go repository.go handler.go database.go
+RUN go build -o shipy-user-service main.go repository.go handler.go database.go token-service.go
 
 FROM alpine:latest
 

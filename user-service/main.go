@@ -24,7 +24,8 @@ func main() {
 	db.AutoMigrate(&pb.User{})
 
 	repo := &UserRepository{db}
-
+	tokenService := &TokenService{repo}
+	
 	// Create a new service. Optionally include some options here.
 	srv := micro.NewService(
 		// This name must match the package name given in your protobuf definition
@@ -36,7 +37,7 @@ func main() {
 	srv.Init()
 
 	// Register handler
-	pb.RegisterUserServiceHandler(srv.Server(), &service{repo})
+	pb.RegisterUserServiceHandler(srv.Server(), &service{repo, tokenService})
 
 	// Run the server
 	if err := srv.Run(); err != nil {
