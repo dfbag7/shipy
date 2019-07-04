@@ -57,6 +57,8 @@ func main() {
 	// Register handler
 	pb.RegisterShippingServiceHandler(srv.Server(), h)
 
+	log.Print("Run the consignment service")
+
 	// Run the server
 	if err := srv.Run(); err != nil {
 		fmt.Println(err)
