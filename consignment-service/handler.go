@@ -28,7 +28,7 @@ func (s *handler) CreateConsignment(ctx context.Context, req *pb.Consignment, re
 		return err
 	}
 
-	log.Printf("Found vessel: %s\n", vesselResponse.Vessel.Name)
+	log.Printf("Found vessel: %s, name: %s\n", vesselResponse.Vessel.Id, vesselResponse.Vessel.Name)
 
 	// We set the VesselId as the vessel we got back from our vessel service
 	req.VesselId = vesselResponse.Vessel.Id
