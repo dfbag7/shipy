@@ -40,35 +40,3 @@ COPY --from=builder /app/shipy-consignment-service/shipy-consignment-service .
 # separate container, with all of the correct dependencies and
 # run time libraries.
 CMD ["./shipy-consignment-service"]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-FROM debian:latest
-
-RUN mkdir /app
-WORKDIR /app
-ADD consignment-service /app/consignment-service
-
-CMD ["./consignment-service"]
-
-
