@@ -11,12 +11,19 @@ services:
     ports:
       - 5432:5432
 
+  nats:
+    image: nats
+    ports:
+      - 4222:4222
+
   shipy-user-service:
     build: ./user-service
     ports:
       - 50053:50051
     environment:
       MICRO_ADDRESS: ":50051"
+      MICRO_BROKER: "nats"
+      MICRO_BROKER_ADDRESS: "nats:4222"
       DB_NAME: "postgres"
       DB_HOST: "database"
       DB_PORT: "5432"
@@ -24,6 +31,7 @@ services:
       DB_PASSWORD: "postgres"
     depends_on:
       - database
+      - nats
 
   shipy-user-cli:
     build: ./user-cli
@@ -57,3 +65,15 @@ services:
       DB_HOST: "mongodb://datastore:27017"
     depends_on:
       - datastore
+
+  shipy-email-service:
+    build: ./email-service
+    ports:
+      - 50054:50054
+    environment:
+      MICRO_SERVER_ADDRESS: ":50054"
+      MICRO_BROKER: "nats"
+      MICRO_BROKER_ADDRESS: "nats:4222"
+    depends_on:
+      - nats
+

@@ -24,7 +24,7 @@ func main() {
 	password := "Testing123"
 	company := "BBC"
 
-	log.Println("Attempting to create user: %s %s %s %s", name, email, password, company)
+	log.Printf("Attempting to create user: %s %s %s %s", name, email, password, company)
 
 	r, err := client.Create(context.TODO(), &pb.User{
 		Name:     name,
