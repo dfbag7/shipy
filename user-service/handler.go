@@ -1,10 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
-	pb "github.com/dfbag7/shipy/user-service/proto/user"
-	"github.com/micro/go-micro/broker"
+	"fmt"
+	pb "github.com/dfbag7/shipy/user-service/proto/auth"
+	"github.com/micro/go-micro"
 	_ "github.com/micro/go-plugins/broker/nats"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/net/context"
@@ -16,7 +16,7 @@ const topic = "user.created"
 type service struct {
 	repo Repository
 	tokenService Authable
-	PubSub broker.Broker
+	Publisher micro.Publisher
 }
 
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.Response) error {
@@ -70,43 +70,16 @@ func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.Response) 
 
 	req.Password = string(hashedPass)
 	if err := srv.repo.Create(req); err != nil {
-		return err
+		return errors.New(fmt.Sprintf("error creating user: %v", err))
 	}
 
 	res.User = req
-	if err := srv.publishEvent(req); err != nil {
-		return err
+	if err := srv.Publisher.Publish(ctx, req); err != nil {
+		return errors.New(fmt.Sprintf("error publishing event: %v", err))
 	}
 
 	return nil
 }
-
-func (srv *service) publishEvent(user *pb.User) error {
-	// Marshal to JSON string
-	body, err := json.Marshal(user)
-	if err != nil {
-		return err
-	}
-
-	// Create a broker message
-	msg := &broker.Message{
-		Header: map[string]string {
-			"id": user.Id,
-		},
-		Body: body,
-	}
-
-	// Publish message to broker
-	// and do not return error if the publish operation is failed
-	if err := srv.PubSub.Publish(topic, msg); err != nil {
-		log.Printf("[pub] failed: %v", err)
-	} else {
-		log.Println("Published event")
-	}
-
-	return nil
-}
-
 
 func (srv *service) ValidateToken(ctx context.Context, req *pb.Token, res *pb.Token) error {
 	log.Printf("Validating token: %s", req.Token)

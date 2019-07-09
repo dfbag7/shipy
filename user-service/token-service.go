@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "github.com/dfbag7/shipy/user-service/proto/user"
+	pb "github.com/dfbag7/shipy/user-service/proto/auth"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -58,7 +58,7 @@ func (srv *TokenService) Encode(user *pb.User) (string, error) {
 		user,
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
-			Issuer: "go.micro.srv.user",
+			Issuer: "shipy.auth",
 		},
 	}
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "github.com/dfbag7/shipy/user-service/proto/user"
+	pb "github.com/dfbag7/shipy/user-service/proto/auth"
 	"github.com/jinzhu/gorm"
 )
 
